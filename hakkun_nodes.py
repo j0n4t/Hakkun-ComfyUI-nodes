@@ -190,8 +190,8 @@ class PromptParser:
                     continue
                 line = self.get_perc_text(line)
 
-            if "@" in line:
-                positive, negative = line.split("@")
+            if "@ " in line:
+                positive, negative = line.split("@ ")
                 positives.append(positive)
                 negatives.append(negative)
             else:
