@@ -133,8 +133,8 @@ class PromptParser:
                 "seed": (INT_TYPE, {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
             "optional": {
-                "extra1": (TEXT_TYPE, {"default": '', "multiline": True, "forceInput": True}),
-                "extra2": (TEXT_TYPE, {"default": '', "multiline": True, "forceInput": True}),
+                "prepend_text": (TEXT_TYPE, {"default": '', "multiline": True, "forceInput": True}),
+                "append_text": (TEXT_TYPE, {"default": '', "multiline": True, "forceInput": True}),
                 "tags": (TEXT_TYPE, {"default": '', "multiline": True, "forceInput": True}),
             }
         }
@@ -279,15 +279,12 @@ class PromptParser:
         elements = [element for element in elements if element]
         return ", ".join(elements)
 
-    def parse_prompt(self, prompt, tags_file, seed, extra1=None, extra2=None, tags=None):
+    def parse_prompt(self, prompt, tags_file, seed, prepend_text=None, append_text=None, tags=None):
         random.seed(seed)
         if isOk(tags_file):
             tags = load_text(tags_file)
 
         prompt = remove_comments(prompt)
-
-        prompt = self.process_extra(prompt, "<extra2>", extra2)
-        prompt = self.process_extra(prompt, "<extra1>", extra1)
 
         if isOk(tags):
             tags = remove_empty_lines(tags)
@@ -300,7 +297,7 @@ class PromptParser:
 
         prompt = self.select_random(prompt)
 
-        result = self.parse(prompt)
+        result = self.parse("\n".join([prepend_text, prompt, append_text]))
 
         result[0] = self.fix_commas(result[0])
         result[1] = self.fix_commas(result[1])
@@ -311,8 +308,8 @@ class PromptParser:
             'POSITIVE:\n' + result[0] +
             '\n\nNEGATIVE:\n' + result[1] +
             '\n\nseed:' + str(seed) +
-            '\n\nextra1:' + (extra1 or "<none>") +
-            '\nextra2:' + (extra2 or "<none>") +
+            '\n\nprepend_text:' + (prepend_text or "<none>") +
+            '\nappend_text:' + (append_text or "<none>") +
             '\n\nRAW:\n' + raw
         )
 
