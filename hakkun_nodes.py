@@ -297,7 +297,7 @@ class PromptParser:
 
         prompt = self.select_random(prompt)
 
-        result = self.parse("\n".join([prepend_text, prompt, append_text]))
+        result = self.parse("\n".join([prepend_text or "", prompt, append_text or ""]))
 
         result[0] = self.fix_commas(result[0])
         result[1] = self.fix_commas(result[1])
